@@ -1,0 +1,47 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "mspTenantId": {
+      "type": "string",
+      "metadata": {
+        "description": "The tenant ID of the MSP (your tenant)."
+      }
+    },
+    "mspObjectId": {
+      "type": "string",
+      "metadata": {
+        "description": "The Object ID of the MSP Service Principal."
+      }
+    },
+    "mspDisplayName": {
+      "type": "string",
+      "defaultValue": "MSP Grafana Access",
+      "metadata": {
+        "description": "A friendly name for the MSP offer."
+      }
+    }
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Authorization/policyAssignments",
+      "apiVersion": "2019-06-01",
+      "name": "[guid(parameters('mspTenantId'), parameters('mspObjectId'))]",
+      "location": "eastus",
+      "properties": {
+        "registrationDefinitionName": "[parameters('mspDisplayName')]",
+        "description": "Delegates access to MSP Grafana monitoring.",
+        "manageeTenantId": "[subscription().tenantId]",
+        "manageeTenantName": "[subscription().displayName]",
+        "mspTenantId": "[parameters('mspTenantId')]",
+        "authorizations": [
+          {
+            "principalId": "[parameters('mspObjectId')]",
+            "principalIdDisplayName": "[parameters('mspDisplayName')]",
+            "roleDefinitionId": "/providers/Microsoft.Authorization/roleDefinitions/b24988ac-6180-42a0-ab88-20f7382dd24c" 
+          }
+        ]
+      }
+    }
+  ]
+}
